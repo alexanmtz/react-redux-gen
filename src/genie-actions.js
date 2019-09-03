@@ -1,4 +1,4 @@
-const genieActions = (entity, types, states) => {
+const genieActionNames = (entity, types, states) => {
     const upperEntity = entity.toUpperCase();
     const actionTypes = types || ['create', 'update', 'delete', 'list', 'fetch'];
     const stateTypes = states || ['REQUESTED', 'SUCCESS', 'ERROR']
@@ -13,4 +13,4 @@ const genieActions = (entity, types, states) => {
     return actions;
 }
 
-export default genieActions;
+export { genieActionsNames };
