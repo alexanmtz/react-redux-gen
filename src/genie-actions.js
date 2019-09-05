@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 const genieActionNames = (entity, types, states) => {
   const upperEntity = entity.toUpperCase();
   const actionTypes = types || ['create', 'update', 'delete', 'list', 'fetch'];
@@ -46,4 +48,20 @@ const genieActions = (entity) => {
   return Array.prototype.concat.apply([], actionCreators)
 }
 
-export { genieActionNames, genieActions };
+const genThunks = (entity, url) => {
+  const generatedActions = genieActions(entity)
+  let actions = {}
+  actions['create'] = () => {
+    return (dispatch) => { 
+      dispatch(generatedActions[0]())
+      return axios.post(url).then(response => {
+        return dispatch(generatedActions[1](response))
+      }).catch( e => {
+        return dispatch(generatedActions[2](e))
+      })
+    }
+  }
+  return actions
+}
+
+export { genieActionNames, genieActions, genThunks };
