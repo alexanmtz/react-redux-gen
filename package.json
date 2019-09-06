@@ -1,8 +1,8 @@
 {
-  "name": "react-redux-genie",
+  "name": "react-redux-gen",
   "version": "0.1.0",
   "description": "A react redux action creator by convention",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
     "start": "webpack --watch",
     "build": "webpack",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alexanmtz/react-redux-genie.git"
+    "url": "git+https://github.com/alexanmtz/react-redux-gen.git"
   },
   "files": [
     "dist",
@@ -29,12 +29,10 @@
   "author": "Alexandre Magno",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/alexanmtz/react-redux-genie/issues"
+    "url": "https://github.com/alexanmtz/react-redux-gen/issues"
   },
-  "homepage": "https://github.com/alexanmtz/react-redux-genie#readme",
+  "homepage": "https://github.com/alexanmtz/react-redux-gen#readme",
   "dependencies": {
-    "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
     "axios": "^0.19.0",
     "jest": "^24.9.0",
     "jest-webpack": "^0.5.1",
@@ -44,6 +42,9 @@
     "webpack": "^4.39.3"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "extract-text-webpack-plugin": "^3.0.2",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^8.0.6",
