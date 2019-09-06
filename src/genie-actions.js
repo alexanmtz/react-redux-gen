@@ -27,13 +27,7 @@ const genieActions = (entity) => {
             action = new Function(`return { type: '${item}', completed: false }`)
             break;
           case 1:
-            action = new Function(`return { type: '${item}', completed: true, error: false }`)
-            if(key === 'list') {
-              action = new Function('data', `return { type: '${item}', completed: true, error: false, data }`)
-            }
-            if(key === 'fetch') {
-              action = new Function('data', `return { type: '${item}', completed: true, error: false, data }`)
-            }
+            action = new Function('data', `return { type: '${item}', completed: true, error: false, data }`)
             break;
           case 2:
             action = new Function('error', `return { type: '${item}', completed: true, error }`)
@@ -55,9 +49,49 @@ const genThunks = (entity, url) => {
     return (dispatch) => { 
       dispatch(generatedActions[0]())
       return axios.post(url).then(response => {
-        return dispatch(generatedActions[1](response))
+        return dispatch(generatedActions[1](response.data))
       }).catch( e => {
         return dispatch(generatedActions[2](e))
+      })
+    }
+  }
+  actions['update'] = () => {
+    return (dispatch) => { 
+      dispatch(generatedActions[3]())
+      return axios.put(url).then(response => {
+        return dispatch(generatedActions[4](response.data))
+      }).catch( e => {
+        return dispatch(generatedActions[5](e))
+      })
+    }
+  }
+  actions['delete'] = () => {
+    return (dispatch) => { 
+      dispatch(generatedActions[6]())
+      return axios.put(url).then(response => {
+        return dispatch(generatedActions[7](response.data))
+      }).catch( e => {
+        return dispatch(generatedActions[8](e))
+      })
+    }
+  }
+  actions['list'] = () => {
+    return (dispatch) => { 
+      dispatch(generatedActions[9]())
+      return axios.get(url).then(response => {
+        return dispatch(generatedActions[10](response.data))
+      }).catch( e => {
+        return dispatch(generatedActions[11](e))
+      })
+    }
+  }
+  actions['fetch'] = () => {
+    return (dispatch) => { 
+      dispatch(generatedActions[12]())
+      return axios.get(url).then(response => {
+        return dispatch(generatedActions[13](response.data))
+      }).catch( e => {
+        return dispatch(generatedActions[14](e))
       })
     }
   }

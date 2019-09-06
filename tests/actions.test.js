@@ -75,18 +75,19 @@ describe('Genie', () => {
     test('Get thunks from gen in a success response for user create', () => {
       const middlewares = [thunk]
       const mockStore = configureMockStore(middlewares)
-      moxios.stubRequest('http://example.com/user/', {
-        status: 200,
-        data: {
-          user: {
-            id: 2,
-            name: 'Jonh doe'
+      moxios.wait(() => {
+        const request = moxios.requests.mostRecent()
+        request.respondWith({
+          status: 200,
+          response: {
+            'id': 1,
+            'name': 'John Doe'
           }
-        }
+        })
       })
       const expectedActions = [
         { type: 'CREATE_USER_REQUESTED', completed: false },
-        { type: 'CREATE_USER_SUCCESS', completed: true, error: false }
+        { type: 'CREATE_USER_SUCCESS', completed: true, error: false, data: { id: 1, name: 'John Doe' } }
       ]
       const store = mockStore({user: {name: 'Jonh Doe'}})
       return store.dispatch(genThunks('user', 'http://example.com/user/')['create']({name: 'jonh doe'})).then(() => {
@@ -105,6 +106,184 @@ describe('Genie', () => {
       ]
       const store = mockStore({user: {name: 'Jonh Doe'}})
       return store.dispatch(genThunks('user', 'http://example.com/user/')['create']({name: 'jonh doe'})).then(() => {
+        expect(store.getActions()).toEqual(expectedActions)
+      })
+    });
+  });
+  describe('Thunk action generators for update', () => {
+    beforeEach(() => {
+      moxios.install()
+    })
+    afterEach(() => {
+      moxios.uninstall()
+    })
+    test('Get thunks from gen in a success response for user update', () => {
+      const middlewares = [thunk]
+      const mockStore = configureMockStore(middlewares)
+      moxios.wait(() => {
+        const request = moxios.requests.mostRecent()
+        request.respondWith({
+          status: 200,
+          response: {
+            'id': 1,
+            'name': 'John Doe 2'
+          }
+        })
+      })
+      const expectedActions = [
+        { type: 'UPDATE_USER_REQUESTED', completed: false },
+        { type: 'UPDATE_USER_SUCCESS', completed: true, error: false, data: {id: 1, name: 'John Doe 2'} }
+      ]
+      const store = mockStore({user: {name: 'Jonh Doe'}})
+      return store.dispatch(genThunks('user', 'http://example.com/user/')['update']({id: 1, name: 'jonh doe 2'})).then(() => {
+        expect(store.getActions()).toEqual(expectedActions)
+      })
+    });
+    test('Get thunks from gen in a error response for user update', () => {
+      const middlewares = [thunk]
+      const mockStore = configureMockStore(middlewares)
+      moxios.stubRequest('http://example.com/user/', {
+        status: 500
+      })
+      const expectedActions = [
+        { type: 'UPDATE_USER_REQUESTED', completed: false },
+        { type: 'UPDATE_USER_ERROR', completed: true, error: new Error('Request failed with status code 500') }
+      ]
+      const store = mockStore({user: {name: 'Jonh Doe'}})
+      return store.dispatch(genThunks('user', 'http://example.com/user/')['update']({name: 'jonh doe'})).then(() => {
+        expect(store.getActions()).toEqual(expectedActions)
+      })
+    });
+  });
+  describe('Thunk action generators for delete', () => {
+    beforeEach(() => {
+      moxios.install()
+    })
+    afterEach(() => {
+      moxios.uninstall()
+    })
+    test('Get thunks from gen in a success response for user delete', () => {
+      const middlewares = [thunk]
+      const mockStore = configureMockStore(middlewares)
+      moxios.wait(() => {
+        const request = moxios.requests.mostRecent()
+        request.respondWith({
+          status: 200,
+          response: {
+            id: 2,
+            name: 'John Doe'
+          }
+        })
+      })
+      const expectedActions = [
+        { type: 'DELETE_USER_REQUESTED', completed: false },
+        { type: 'DELETE_USER_SUCCESS', completed: true, error: false, data: {id: 2, name: 'John Doe'} }
+      ]
+      const store = mockStore({user: {name: 'Jonh Doe'}})
+      return store.dispatch(genThunks('user', 'http://example.com/user/')['delete']({id: 2})).then(() => {
+        expect(store.getActions()).toEqual(expectedActions)
+      })
+    });
+    test('Get thunks from gen in a error response for user create', () => {
+      const middlewares = [thunk]
+      const mockStore = configureMockStore(middlewares)
+      moxios.stubRequest('http://example.com/user/', {
+        status: 500
+      })
+      const expectedActions = [
+        { type: 'DELETE_USER_REQUESTED', completed: false },
+        { type: 'DELETE_USER_ERROR', completed: true, error: new Error('Request failed with status code 500') }
+      ]
+      const store = mockStore({user: {id: 2}})
+      return store.dispatch(genThunks('user', 'http://example.com/user/')['delete']({name: 'jonh doe'})).then(() => {
+        expect(store.getActions()).toEqual(expectedActions)
+      })
+    });
+  });
+  describe('Thunk action generators for user list', () => {
+    beforeEach(() => {
+      moxios.install()
+    })
+    afterEach(() => {
+      moxios.uninstall()
+    })
+    test('Get thunks from gen in a success response for user list', () => {
+      const middlewares = [thunk]
+      const mockStore = configureMockStore(middlewares)
+      moxios.wait(() => {
+        const request = moxios.requests.mostRecent()
+        request.respondWith({
+          status: 200,
+          response: [{
+            'name': 'John Doe'
+          }]
+        })
+      })
+      const expectedActions = [
+        { type: 'LIST_USER_REQUESTED', completed: false },
+        { type: 'LIST_USER_SUCCESS', completed: true, error: false, data: [{name: 'John Doe'}] }
+      ]
+      const store = mockStore({users: [{name: 'Jonh Doe'}]})
+      return store.dispatch(genThunks('user', 'http://example.com/user/')['list']({id: 2})).then(() => {
+        expect(store.getActions()).toEqual(expectedActions)
+      })
+    });
+    test('Get thunks from gen in a error response for user list', () => {
+      const middlewares = [thunk]
+      const mockStore = configureMockStore(middlewares)
+      moxios.stubRequest('http://example.com/user/', {
+        status: 500
+      })
+      const expectedActions = [
+        { type: 'LIST_USER_REQUESTED', completed: false },
+        { type: 'LIST_USER_ERROR', completed: true, error: new Error('Request failed with status code 500') }
+      ]
+      const store = mockStore({user: {id: 2}})
+      return store.dispatch(genThunks('user', 'http://example.com/user/')['list']()).then(() => {
+        expect(store.getActions()).toEqual(expectedActions)
+      })
+    });
+  });
+  describe('Thunk action generators for user fetch', () => {
+    beforeEach(() => {
+      moxios.install()
+    })
+    afterEach(() => {
+      moxios.uninstall()
+    })
+    test('Get thunks from gen in a success response for user fetch', () => {
+      const middlewares = [thunk]
+      const mockStore = configureMockStore(middlewares)
+      moxios.wait(() => {
+        const request = moxios.requests.mostRecent()
+        request.respondWith({
+          status: 200,
+          response: {
+            'name': 'John Doe'
+          }
+        })
+      })
+      const expectedActions = [
+        { type: 'FETCH_USER_REQUESTED', completed: false },
+        { type: 'FETCH_USER_SUCCESS', completed: true, error: false, data: {name: 'John Doe'} }
+      ]
+      const store = mockStore({users: [{name: 'Jonh Doe'}]})
+      return store.dispatch(genThunks('user', 'http://example.com/user/')['fetch']({id: 2})).then(() => {
+        expect(store.getActions()).toEqual(expectedActions)
+      })
+    });
+    test('Get thunks from gen in a error response for user fetch', () => {
+      const middlewares = [thunk]
+      const mockStore = configureMockStore(middlewares)
+      moxios.stubRequest('http://example.com/user/', {
+        status: 500
+      })
+      const expectedActions = [
+        { type: 'FETCH_USER_REQUESTED', completed: false },
+        { type: 'FETCH_USER_ERROR', completed: true, error: new Error('Request failed with status code 500') }
+      ]
+      const store = mockStore({user: {id: 2}})
+      return store.dispatch(genThunks('user', 'http://example.com/user/')['fetch']()).then(() => {
         expect(store.getActions()).toEqual(expectedActions)
       })
     });
