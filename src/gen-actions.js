@@ -50,14 +50,15 @@ const genAsyncActions = (entity, url, headers, types, states) => {
   let actions = {}
   const methodKeys = {'create': 'post', 'update': 'update', 'delete': 'delete', 'list': 'get', 'fetch': 'get'}
   Object.keys(generatedActions).forEach(key => {
-    actions[key] = (data) => {
+    actions[key] = (data, params) => {
       return (dispatch) => { 
         dispatch(generatedActions[key][0]())
         return axios({
           method: methodKeys[key],
           headers,
-          data,
-          url
+          data: key === 'create' ? data : {},
+          params: key === 'update' ? params : {},
+          url: key === 'fetch' || key === 'update' || key === 'delete' ? `${url}/${data}` : url
         }).then(response => {
           return dispatch(generatedActions[key][1](response.data))
         }).catch( e => {
