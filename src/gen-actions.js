@@ -3,7 +3,7 @@ import axios from 'axios'
 const globalTypes = ['create', 'update', 'delete', 'list', 'fetch']
 const globalStates = ['REQUESTED', 'SUCCESS', 'ERROR']
 
-const genieActionNames = (entity, types, states) => {
+const genActionNames = (entity, types, states) => {
   const upperEntity = entity.toUpperCase();
   const actionTypes = types || globalTypes;
   const stateTypes = states || globalStates
@@ -18,8 +18,8 @@ const genieActionNames = (entity, types, states) => {
   return actions;
 }
 
-const geniePlainActions = (entity, types, states) => {
-  const actionNames = genieActionNames(entity, types, states)
+const genPlainActions = (entity, types, states) => {
+  const actionNames = genActionNames(entity, types, states)
   let actionCreators = []
 
   Object.keys(actionNames).forEach(key => {
@@ -30,10 +30,10 @@ const geniePlainActions = (entity, types, states) => {
             action = new Function(`return { type: '${item}', completed: false }`)
             break;
           case 1:
-            action = new Function('data', `return { type: '${item}', completed: true, error: false, data }`)
+            action = new Function('data', `return { type: '${item}', completed: true, error: false, data: data }`)
             break;
           case 2:
-            action = new Function('error', `return { type: '${item}', completed: true, error }`)
+            action = new Function('error', `return { type: '${item}', completed: true, error: error }`)
             break;
           default:
             action = () => ({ type: 'UNKNOWN' })
@@ -45,14 +45,20 @@ const geniePlainActions = (entity, types, states) => {
   return actionCreators
 }
 
-const genAsyncActions = (entity, url, types, states) => {
-  const generatedActions = geniePlainActions(entity, types, states)
+const genAsyncActions = (entity, url, headers, types, states) => {
+  const generatedActions = genPlainActions(entity, types, states)
   let actions = {}
+  const methodKeys = {'create': 'post', 'update': 'update', 'delete': 'delete', 'list': 'get', 'fetch': 'get'}
   Object.keys(generatedActions).forEach(key => {
-    actions[key] = () => {
+    actions[key] = (data) => {
       return (dispatch) => { 
         dispatch(generatedActions[key][0]())
-        return axios.post(url).then(response => {
+        return axios({
+          method: methodKeys[key],
+          headers,
+          data,
+          url
+        }).then(response => {
           return dispatch(generatedActions[key][1](response.data))
         }).catch( e => {
           return dispatch(generatedActions[key][2](e))
@@ -63,4 +69,4 @@ const genAsyncActions = (entity, url, types, states) => {
   return actions
 }
 
-export { genieActionNames, geniePlainActions, genAsyncActions };
+export { genActionNames, genPlainActions, genAsyncActions };

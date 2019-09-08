@@ -1,4 +1,4 @@
-import { genieActionNames, geniePlainActions, genAsyncActions } from './gen-actions'
+import { genActionNames, genPlainActions, genAsyncActions } from './gen-actions'
 import { genReducer} from './gen-reducers'
 
-export { genieActionNames, geniePlainActions, genAsyncActions, genReducer }
+export { genActionNames, genPlainActions, genAsyncActions, genReducer }

@@ -1,12 +1,12 @@
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import moxios from 'moxios'
-import { genieActionNames, geniePlainActions, genAsyncActions } from '../src/gen-actions'
+import { genActionNames, genPlainActions, genAsyncActions } from '../src/gen-actions'
 
 describe('Gen', () => {
   describe('Action names', () => {
     test('Get default actions from gen', () => {
-      expect(genieActionNames('user')).toEqual({
+      expect(genActionNames('user')).toEqual({
         'create': ['CREATE_USER_REQUESTED', 'CREATE_USER_SUCCESS', 'CREATE_USER_ERROR'],
         'update': ['UPDATE_USER_REQUESTED', 'UPDATE_USER_SUCCESS', 'UPDATE_USER_ERROR'],
         'delete': ['DELETE_USER_REQUESTED', 'DELETE_USER_SUCCESS', 'DELETE_USER_ERROR'],
@@ -15,41 +15,41 @@ describe('Gen', () => {
       });
     });
     test('Get custom actions from gen', () => {
-      expect(genieActionNames('user', ['login'])).toEqual({
+      expect(genActionNames('user', ['login'])).toEqual({
         'login': ['LOGIN_USER_REQUESTED', 'LOGIN_USER_SUCCESS', 'LOGIN_USER_ERROR']
       });
     });
     test('Get custom states from gen', () => {
-      expect(genieActionNames('user', ['login'], ['started', 'ready', 'error'])).toEqual({
+      expect(genActionNames('user', ['login'], ['started', 'ready', 'error'])).toEqual({
         'login': ['LOGIN_USER_STARTED', 'LOGIN_USER_READY', 'LOGIN_USER_ERROR']
       });
     });
   });
   describe('Action generators', () => {
     test('Get actions from gen user create', () => {
-      expect(geniePlainActions('user')['create'][0]()).toEqual({ type: 'CREATE_USER_REQUESTED', completed: false });
-      expect(geniePlainActions('user')['create'][1]({})).toEqual({ type: 'CREATE_USER_SUCCESS', error: false, completed: true, data: {} });
-      expect(geniePlainActions('user')['create'][2]({})).toEqual({ type: 'CREATE_USER_ERROR', error: {}, completed: true });
+      expect(genPlainActions('user')['create'][0]()).toEqual({ type: 'CREATE_USER_REQUESTED', completed: false });
+      expect(genPlainActions('user')['create'][1]({})).toEqual({ type: 'CREATE_USER_SUCCESS', error: false, completed: true, data: {} });
+      expect(genPlainActions('user')['create'][2]({})).toEqual({ type: 'CREATE_USER_ERROR', error: {}, completed: true });
     });
     test('Get actions from gen user update', () => {
-      expect(geniePlainActions('user')['update'][0]()).toEqual({ type: 'UPDATE_USER_REQUESTED', completed: false });
-      expect(geniePlainActions('user')['update'][1]({})).toEqual({ type: 'UPDATE_USER_SUCCESS', error: false, completed: true, data: {} });
-      expect(geniePlainActions('user')['update'][2]({})).toEqual({ type: 'UPDATE_USER_ERROR', error: {}, completed: true });
+      expect(genPlainActions('user')['update'][0]()).toEqual({ type: 'UPDATE_USER_REQUESTED', completed: false });
+      expect(genPlainActions('user')['update'][1]({})).toEqual({ type: 'UPDATE_USER_SUCCESS', error: false, completed: true, data: {} });
+      expect(genPlainActions('user')['update'][2]({})).toEqual({ type: 'UPDATE_USER_ERROR', error: {}, completed: true });
     });
     test('Get actions from gen user delete', () => {
-      expect(geniePlainActions('user')['delete'][0]()).toEqual({ type: 'DELETE_USER_REQUESTED', completed: false });
-      expect(geniePlainActions('user')['delete'][1]({})).toEqual({ type: 'DELETE_USER_SUCCESS', error: false, completed: true, data: {} });
-      expect(geniePlainActions('user')['delete'][2]({})).toEqual({ type: 'DELETE_USER_ERROR', error: {}, completed: true });
+      expect(genPlainActions('user')['delete'][0]()).toEqual({ type: 'DELETE_USER_REQUESTED', completed: false });
+      expect(genPlainActions('user')['delete'][1]({})).toEqual({ type: 'DELETE_USER_SUCCESS', error: false, completed: true, data: {} });
+      expect(genPlainActions('user')['delete'][2]({})).toEqual({ type: 'DELETE_USER_ERROR', error: {}, completed: true });
     });
     test('Get actions from gen user list', () => {
-      expect(geniePlainActions('user')['list'][0]()).toEqual({ type: 'LIST_USER_REQUESTED', completed: false });
-      expect(geniePlainActions('user')['list'][1]({})).toEqual({ type: 'LIST_USER_SUCCESS', error: false, completed: true, data: {} });
-      expect(geniePlainActions('user')['list'][2]({})).toEqual({ type: 'LIST_USER_ERROR', error: {}, completed: true });
+      expect(genPlainActions('user')['list'][0]()).toEqual({ type: 'LIST_USER_REQUESTED', completed: false });
+      expect(genPlainActions('user')['list'][1]({})).toEqual({ type: 'LIST_USER_SUCCESS', error: false, completed: true, data: {} });
+      expect(genPlainActions('user')['list'][2]({})).toEqual({ type: 'LIST_USER_ERROR', error: {}, completed: true });
     });
     test('Get actions from gen user fetch', () => {
-      expect(geniePlainActions('user')['fetch'][0]()).toEqual({ type: 'FETCH_USER_REQUESTED', completed: false });
-      expect(geniePlainActions('user')['fetch'][1]({})).toEqual({ type: 'FETCH_USER_SUCCESS', error: false, completed: true, data: {} });
-      expect(geniePlainActions('user')['fetch'][2]({})).toEqual({ type: 'FETCH_USER_ERROR', error: {}, completed: true });
+      expect(genPlainActions('user')['fetch'][0]()).toEqual({ type: 'FETCH_USER_REQUESTED', completed: false });
+      expect(genPlainActions('user')['fetch'][1]({})).toEqual({ type: 'FETCH_USER_SUCCESS', error: false, completed: true, data: {} });
+      expect(genPlainActions('user')['fetch'][2]({})).toEqual({ type: 'FETCH_USER_ERROR', error: {}, completed: true });
     });
   });
   describe('Thunk action generators for create', () => {

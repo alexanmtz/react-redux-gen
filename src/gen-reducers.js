@@ -1,7 +1,7 @@
-import { genieActionNames } from './gen-actions'
+import { genActionNames } from './gen-actions'
 
 const genReducer = (entity, initialState) => {
-  const actions = genieActionNames(entity)
+  const actions = genActionNames(entity)
   return (state = initialState, action) => {
     switch (action.type) {
       case actions['create'][0]:
