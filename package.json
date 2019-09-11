@@ -34,8 +34,6 @@
   "homepage": "https://github.com/alexanmtz/react-redux-gen#readme",
   "dependencies": {
     "axios": "^0.19.0",
-    "jest": "^24.9.0",
-    "jest-webpack": "^0.5.1",
     "path": "^0.12.7",
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
@@ -50,6 +48,8 @@
     "babel-loader": "^8.0.6",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.7.0",
+    "jest": "^24.9.0",
+    "jest-webpack": "^0.5.1",
     "moxios": "^0.4.0",
     "redux-mock-store": "^1.5.3",
     "webpack-cli": "^3.3.7"
