@@ -24,6 +24,10 @@ describe('Gen', () => {
         'login': ['LOGIN_USER_STARTED', 'LOGIN_USER_READY', 'LOGIN_USER_ERROR']
       });
     });
+    test('Get custom states from gen actions', () => {
+      console.log(genPlainActions('user', ['login']))
+      expect(genPlainActions('user', ['login']).login[0]()).toEqual({ type: 'LOGIN_USER_REQUESTED', completed: false });
+    });
   });
   describe('Action generators', () => {
     test('Get actions from gen user create', () => {
