@@ -4,7 +4,7 @@ Redux-gen will generate actions, thunk and reducers in one line using naming con
 You can use fully if you have an standard object CRUD, like an User, or use the plain actions and extend with your async actions.
 
 ## Purpose
-Redux Gen generate actions and reducers
+Redux Gen generate actions and reducers based on convention, and there's many use cases to use the way you want
 
 ## Why?
 As the application increase, the process of create actions and reducers is pretty repetitive and we can get a lot of benefits if we use the same language that API REST naming conventions if we are connecting on an API.
@@ -59,6 +59,12 @@ const example = () => {
   }
 }
 ```
+
+### Important NOTE!
+
+The async actions is still experimental and we don't support much customization for these case, and we hope to improve this for new releases.
+
+### How to use
 
 With the async object is possible to dispatch actions from this call, for example:
 `genAsyncActions('user', 'http://example.com/user/')['create']({name: 'jonh doe'})`
