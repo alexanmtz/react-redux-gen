@@ -1,3 +1,5 @@
+![](react-redux-gen-small.png)
+
 # react-redux-gen
 Redux-gen will generate actions, thunk and reducers in one line using naming conventions and API based.
 
