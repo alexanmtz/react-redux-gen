@@ -1,2 +1,200 @@
-# react-redux-genie
-Make a wish in your react redux app and the redux-genie will generate actions, thunk and reducers
+# react-redux-gen
+Redux-gen will generate actions, thunk and reducers in one line using naming conventions and API based.
+
+You can use fully if you have an standard object CRUD, like an User, or use the plain actions and extend with your async actions.
+
+
+## Why?
+As the application increase, the process of create actions and reducers is pretty repetitive and we can get a lot of benefits if we use the same language that API REST naming conventions if we are connecting on an API.
+
+## Redux Gen generate actions and reducers
+
+### Example
+
+This is a basic example to use to define the CRUD actions for your `user` object
+
+```
+import { genPlainActions, genAsyncActions } from 'react-redux-gen'
+
+const userActions = genPlainActions('user')
+const userAsyncActions = genAsyncActions('user', '/users)
+
+export { userActions, userAsyncActions }
+```
+
+This code above will generate the actions needed with states `REQUESTED`, `SUCCESS` and `ERROR` for actions and the async actions with the basic calls from these states.
+
+#### This will generate the following actions object:
+
+```
+{
+  'create': ['CREATE_USER_REQUESTED', 'CREATE_USER_SUCCESS', 'CREATE_USER_ERROR'],
+  'update': ['UPDATE_USER_REQUESTED', 'UPDATE_USER_SUCCESS', 'UPDATE_USER_ERROR'],
+  'delete': ['DELETE_USER_REQUESTED', 'DELETE_USER_SUCCESS', 'DELETE_USER_ERROR'],
+  'list': ['LIST_USER_REQUESTED', 'LIST_USER_SUCCESS', 'LIST_USER_ERROR'],
+  'fetch': ['FETCH_USER_REQUESTED', 'FETCH_USER_SUCCESS', 'FETCH_USER_ERROR'],
+}
+```
+
+#### And the following async actions from a base url
+
+Our generated async actions is like this:
+```
+import axios from 'axios'
+import { genPlainActions, genActionNames } from 'react-redux-gen'
+
+const actions = genPlainActions('user',['action'])
+// [0] => REQUESTED, [1] => SUCCESS, [2] => ERROR
+
+const example = () => {
+  return dispatch => {
+    dispatch(actions.action[0]())
+    return axios
+      .get('/authenticated')
+      .then( response => {
+        return dispatch(actions.action[1](response.data))
+      }).catch( e => {
+        return dispatch(actions.action[2](e))
+      })
+  }
+}
+```
+
+With the async object is possible to dispatch actions from this call, for example:
+`genAsyncActions('user', 'http://example.com/user/')['create']({name: 'jonh doe'})`
+
+Will dispatch `{ type: 'CREATE_USER_REQUESTED', completed: false }`, `{ type: 'CREATE_USER_SUCCESS', error: false, completed: true, data: {name: 'John doe'} }`, 
+
+and for an error on create:
+
+will generate `{ type: 'CREATE_USER_REQUESTED', completed: false }`, `{ type: 'CREATE_USER_ERROR', error: {}, completed: true }`
+
+If you want to pass headers to axios, you should run like this example:
+
+```
+import { genPlainActions, genAsyncActions } from 'react-redux-gen' 
+
+const headers = {
+    'Authorization': `Basic ${process.env.REACT_APP_SECRET}`,
+    'Content-Type': 'application/json'
+  }
+
+const userActions = genPlainActions('user')
+const userAsyncActions = genAsyncActions('user', '/users', headers)
+
+export { userActions, userAsyncActions }
+```
+
+### And for reducers
+
+```
+import { genReducer } from 'react-redux-gen'
+
+const user = genReducer('user', { data: {}, error: false, completed: true }) // the object and initial state
+
+export default user
+```
+
+### Custom examples
+
+If you want to use just the actions and use your own async actions, feel free to do like the example below for a login action:
+```import axios from 'axios'
+import { genPlainActions, genActionNames } from 'react-redux-gen'
+import { host } from '../url'
+
+import Auth from '../modules/Auth'
+
+const headers = {
+  'Authorization': `Bearer ${Auth.getToken()}`,
+  'Content-Type': 'application/json'
+}
+
+const loginActionNames = genActionNames('user', ['logged', 'login', 'logout'])
+const loginActions = genPlainActions('user',['logged', 'login', 'logout', 'register'])
+
+const logged = () => {
+  return dispatch => {
+    dispatch(loginActions.logged[0]())
+    return axios
+      .get(host + '/authenticated', { headers: {
+        'Authorization': `Bearer ${Auth.getToken()}`,
+        'Content-Type': 'application/json'
+      }
+      })
+      .then( response => {
+        return dispatch(loginActions.logged[1](response.data))
+      }).catch( e => {
+        return dispatch(loginActions.logged[2](e))
+      })
+  }
+}
+
+const login = (user) => {
+  return dispatch => {
+    dispatch(loginActions.login[0]())
+    return axios
+      .post(host + '/authorize/local', user)
+      .then( response => {
+        return dispatch(loginActions.login[1](response.data))
+      }).catch( e => {
+        return dispatch(loginActions.login[2](e))
+      })
+  }
+}
+
+const logout = () => {
+  return (dispatch) => {
+    dispatch(loginActions.logout[0]())
+    if(Auth.deauthenticateUser()) {
+      return dispatch(loginActions.logout[1]({}))
+    }
+    return dispatch(loginActions.logout[2](new Error('we have an error to logout, try again later')))
+  }
+}
+
+const register = (user) => {
+  return dispatch => {
+    dispatch(loginActions.register[0]())
+    return axios
+      .post(host + '/auth/register', user)
+      .then( response => {
+        return dispatch(loginActions.register[1](response.data))
+      }).catch( e => {
+        return dispatch(loginActions.register[2](e))
+      })
+  }
+}
+
+
+
+export { loginActionNames, loginActions, logged, login, logout, register }
+```
+
+### Reducer
+For a login reducer, we could use
+```
+import {
+  loginActionNames
+} from '../actions/login'
+
+const login = (state = { completed: true, data: {}, error: false }, action) => {
+  switch (action.type) {
+    case loginActionNames.logged[0]:
+      return { ...state, completed: action.completed }
+    case loginActionNames.logged[1]:
+      return { ...state, completed: action.completed, data: action.data, error: false }
+    case loginActionNames.logged[2]:
+      return { ...state, completed: action.completed, error: action.error }
+    case loginActionNames.logout[0]:
+      return { ...state, completed: action.completed, error: action.error }
+    case loginActionNames.logout[1]:
+      return { ...state, completed: action.completed, error: action.error, data: action.data }
+    case loginActionNames.logout[2]:
+      return { ...state, completed: action.completed, error: action.error }
+    default:
+      return state
+  }
+}
+
+export default login
+```
