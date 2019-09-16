@@ -3,11 +3,11 @@ Redux-gen will generate actions, thunk and reducers in one line using naming con
 
 You can use fully if you have an standard object CRUD, like an User, or use the plain actions and extend with your async actions.
 
+## Purpose
+Redux Gen generate actions and reducers
 
 ## Why?
 As the application increase, the process of create actions and reducers is pretty repetitive and we can get a lot of benefits if we use the same language that API REST naming conventions if we are connecting on an API.
-
-## Redux Gen generate actions and reducers
 
 ### Example
 
@@ -198,3 +198,14 @@ const login = (state = { completed: true, data: {}, error: false }, action) => {
 
 export default login
 ```
+
+## Contribute
+
+### Run the first time
+`yarn install`
+
+### Run the project
+`yarn start`
+
+### Run the tests
+`yarn test`
