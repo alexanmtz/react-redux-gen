@@ -3,6 +3,8 @@ Redux-gen will generate actions, thunk and reducers in one line using naming con
 
 You can use fully if you have an standard object CRUD, like an User, or use the plain actions and extend with your async actions.
 
+This is based on Redux. If this is too advanced for you, and you need to know more in how to use redux, please check the guides: https://redux.js.org/recipes/reducing-boilerplate
+
 ## Purpose
 Redux Gen generate actions and reducers based on convention, and there's many use cases to use the way you want
 
