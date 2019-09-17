@@ -219,3 +219,7 @@ export default login
 
 ### Run the tests
 `yarn test`
+
+
+### Contributors
+This package is maintained by [Alexandre Magno](alexandremagno.net)
