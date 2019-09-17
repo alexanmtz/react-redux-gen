@@ -222,4 +222,4 @@ export default login
 
 
 ### Contributors
-This package is maintained by [Alexandre Magno](alexandremagno.net)
+This package is maintained by [Alexandre Magno](https://alexandremagno.net)
