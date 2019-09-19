@@ -13,6 +13,61 @@ Redux Gen generate actions and reducers based on convention, and there's many us
 ## Why?
 As the application increase, the process of create actions and reducers is pretty repetitive and we can get a lot of benefits if we use the same language that API REST naming conventions if we are connecting on an API.
 
+## Methods
+
+You can use these three utility functions from react-redux-gen:
+`import { genActionNames, genPlainActions, genAsyncActions } from 'react-redux-gen'`
+
+### genActionNames
+
+Returns the action names in a object so you can use to be referecend later, like on reducers
+
+| Parameter     | Type          | Description           | Default                                                |
+| ------------- | ------------- | --------------------- | ------------------------------------------------------ |
+| entity        | String        | The entity name       | There's no default for this one                        |
+| types         | Array         | Types of action       | Array('create', 'update', 'delete', 'list', 'fetch'    |
+| states        | Array         | States of request     | Array('REQUESTED', 'SUCCESS', 'ERROR')                 |  
+
+### genPlainActions
+
+Returns the action functions in a friendly way to be used to dispatch actions
+
+| Parameter     | Type          | Description           | Default                                                |
+| ------------- | ------------- | --------------------- | ------------------------------------------------------ |
+| entity        | String        | The entity name       | There's no default for this one                        |
+| types         | Array         | Types of action       | Array('create', 'update', 'delete', 'list', 'fetch'    |
+| states        | Array         | States of request     | Array('REQUESTED', 'SUCCESS', 'ERROR')                 |  
+
+For `REQUESTED` state, it will return the following action object:
+
+```
+{ type: 'ENTITY_TYPE_REQUESTED', completed: false, error: false }
+```
+
+For `SUCCESS` state, it will return the following action object:
+
+```
+{ type: 'ENTITY_TYPE_SUCCESS', completed: true, data: data, error: false }
+```
+
+For `ERROR` state, it will return the following action object:
+
+```
+{ type: 'ENTITY_TYPE_ERROR', completed: true, error: error }
+```
+
+### genAsyncActions
+
+Returns the async action standard function to communicate with rest API. These functions make calls to api's based on the base URL, dispatching request action, success when succeed, and error when the the call to the api fails. We use axios to make our calls.
+
+| Parameter     | Type          | Description                 | Default                                                |
+| ------------- | ------------- | --------------------------- | ------------------------------------------------------ |
+| entity        | String        | The entity name             | There's no default for this one                        |
+| url           | String        | The base url to call        | There's no default for this one                        |
+| headers       | Object        | Extra headers               | There's no default for this one                        |
+| types         | Array         | Types of action             | Array('create', 'update', 'delete', 'list', 'fetch'    |
+| states        | Array         | States of request           | Array('REQUESTED', 'SUCCESS', 'ERROR')                 |  
+
 ### Example
 
 This is a basic example to use to define the CRUD actions for your `user` object
