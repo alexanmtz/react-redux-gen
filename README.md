@@ -26,7 +26,7 @@ Returns the action names in a object so you can use to be referecend later, like
 | Parameter     | Type          | Description           | Default                                                |
 | ------------- | ------------- | --------------------- | ------------------------------------------------------ |
 | entity        | String        | The entity name       | There's no default for this one                        |
-| types         | Array         | Types of action       | Array('create', 'update', 'delete', 'list', 'fetch'    |
+| types         | Array         | Types of action       | Array('create', 'update', 'delete', 'list', 'fetch')   |
 | states        | Array         | States of request     | Array('REQUESTED', 'SUCCESS', 'ERROR')                 |  
 
 ### genPlainActions
@@ -36,7 +36,7 @@ Returns the action functions in a friendly way to be used to dispatch actions
 | Parameter     | Type          | Description           | Default                                                |
 | ------------- | ------------- | --------------------- | ------------------------------------------------------ |
 | entity        | String        | The entity name       | There's no default for this one                        |
-| types         | Array         | Types of action       | Array('create', 'update', 'delete', 'list', 'fetch'    |
+| types         | Array         | Types of action       | Array('create', 'update', 'delete', 'list', 'fetch')   |
 | states        | Array         | States of request     | Array('REQUESTED', 'SUCCESS', 'ERROR')                 |  
 
 For `REQUESTED` state, it will return the following action object:
