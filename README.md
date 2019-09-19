@@ -109,7 +109,7 @@ Our generated async actions is like this:
 import axios from 'axios'
 import { genPlainActions, genActionNames } from 'react-redux-gen'
 
-const actions = genPlainActions('user',['action'])
+const actions = genPlainActions('user', '/authenticated', ['action'])
 // [0] => REQUESTED, [1] => SUCCESS, [2] => ERROR
 
 const example = () => {
@@ -133,9 +133,11 @@ The async actions is still experimental and we don't support much customization 
 ### How to use
 
 With the async object is possible to dispatch actions from this call, for example:
+
 `genAsyncActions('user', 'http://example.com/user/')['create']({name: 'jonh doe'})`
 
-Will dispatch `{ type: 'CREATE_USER_REQUESTED', completed: false }`, `{ type: 'CREATE_USER_SUCCESS', error: false, completed: true, data: {name: 'John doe'} }`, 
+Will dispatch 
+`{ type: 'CREATE_USER_REQUESTED', completed: false }`, `{ type: 'CREATE_USER_SUCCESS', error: false, completed: true, data: {name: 'John doe'} }`, 
 
 and for an error on create:
 
