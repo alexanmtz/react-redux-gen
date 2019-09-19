@@ -273,6 +273,13 @@ const login = (state = { completed: true, data: {}, error: false }, action) => {
 export default login
 ```
 
+## Where is used
+
+### Ahorta - ()[https://ahorta.io]
+You can check our actions and reducers from a project using react-redux-gen
+
+(See full example on a real project)[https://github.com/worknenjoy/ahorta-client/tree/master/src]
+
 ## Contribute
 
 ### Run the first time
