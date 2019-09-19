@@ -23,6 +23,8 @@ You can use these three utility functions from react-redux-gen:
 
 Returns the action names in a object so you can use to be referecend later, like on reducers
 
+`genActionNames(entity, types, states)`
+
 | Parameter     | Type          | Description           | Default                                                |
 | ------------- | ------------- | --------------------- | ------------------------------------------------------ |
 | entity        | String        | The entity name       | There's no default for this one                        |
@@ -32,6 +34,8 @@ Returns the action names in a object so you can use to be referecend later, like
 ### genPlainActions
 
 Returns the action functions in a friendly way to be used to dispatch actions
+
+`genPlainActions(entity, types, states)`
 
 | Parameter     | Type          | Description           | Default                                                |
 | ------------- | ------------- | --------------------- | ------------------------------------------------------ |
@@ -60,6 +64,8 @@ For `ERROR` state, it will return the following action object:
 ### genAsyncActions
 
 Returns the async action standard function to communicate with rest API. These functions make calls to api's based on the base URL, dispatching request action, success when succeed, and error when the the call to the api fails. We use axios to make our calls.
+
+`genAsyncActions(entity, url, headers, types, states)`
 
 | Parameter     | Type          | Description                 | Default                                                |
 | ------------- | ------------- | --------------------------- | ------------------------------------------------------ |
