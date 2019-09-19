@@ -275,10 +275,10 @@ export default login
 
 ## Where is used
 
-### Ahorta - ()[https://ahorta.io]
+### Ahorta - [https://ahorta.io]()
 You can check our actions and reducers from a project using react-redux-gen
 
-(See full example on a real project)[https://github.com/worknenjoy/ahorta-client/tree/master/src]
+[https://github.com/worknenjoy/ahorta-client/tree/master/src](See full example on a real project)
 
 ## Contribute
 
