@@ -16,6 +16,7 @@ As the application increase, the process of create actions and reducers is prett
 ## Methods
 
 You can use these three utility functions from react-redux-gen:
+
 `import { genActionNames, genPlainActions, genAsyncActions } from 'react-redux-gen'`
 
 ### genActionNames
@@ -65,7 +66,7 @@ Returns the async action standard function to communicate with rest API. These f
 | entity        | String        | The entity name             | There's no default for this one                        |
 | url           | String        | The base url to call        | There's no default for this one                        |
 | headers       | Object        | Extra headers               | There's no default for this one                        |
-| types         | Array         | Types of action             | Array('create', 'update', 'delete', 'list', 'fetch'    |
+| types         | Array         | Types of action             | Array('create', 'update', 'delete', 'list', 'fetch')   |
 | states        | Array         | States of request           | Array('REQUESTED', 'SUCCESS', 'ERROR')                 |  
 
 ### Example
