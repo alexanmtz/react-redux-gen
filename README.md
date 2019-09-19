@@ -1,5 +1,17 @@
 ![](react-redux-gen-medium.png)
 
+### NPM
+You can find [this package on NPM](https://www.npmjs.com/package/react-redux-gen)
+
+### Install
+Yarn: 
+
+`yarn react-redux-gen`
+
+NPM:
+
+`npm install react-redux-gen`
+
 # react-redux-gen
 Redux-gen will generate actions, thunk and reducers in one line using naming conventions and API based.
 
@@ -278,7 +290,7 @@ export default login
 ### Ahorta - [https://ahorta.io]()
 You can check our actions and reducers from a project using react-redux-gen
 
-[https://github.com/worknenjoy/ahorta-client/tree/master/src](See full example on a real project)
+[See full example on a real project](https://github.com/worknenjoy/ahorta-client/tree/master/src)
 
 ## Contribute
 
@@ -294,3 +306,6 @@ You can check our actions and reducers from a project using react-redux-gen
 
 ### Contributors
 This package is maintained by [Alexandre Magno](https://alexandremagno.net)
+
+### License
+This open source library is licensed under [MIT](https://github.com/alexanmtz/react-redux-gen/blob/master/LICENSE)
