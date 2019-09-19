@@ -149,6 +149,7 @@ With the async object is possible to dispatch actions from this call, for exampl
 `genAsyncActions('user', 'http://example.com/user/')['create']({name: 'jonh doe'})`
 
 Will dispatch 
+
 `{ type: 'CREATE_USER_REQUESTED', completed: false }`, `{ type: 'CREATE_USER_SUCCESS', error: false, completed: true, data: {name: 'John doe'} }`, 
 
 and for an error on create:
@@ -287,7 +288,7 @@ export default login
 
 ## Where is used
 
-### Ahorta - [https://ahorta.io]()
+### Ahorta - [](https://ahorta.io)
 You can check our actions and reducers from a project using react-redux-gen
 
 [See full example on a real project](https://github.com/worknenjoy/ahorta-client/tree/master/src)
