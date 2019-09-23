@@ -1,5 +1,17 @@
 ![](react-redux-gen-medium.png)
 
+### NPM
+You can find [this package on NPM](https://www.npmjs.com/package/react-redux-gen)
+
+### Install
+Yarn: 
+
+`yarn react-redux-gen`
+
+NPM:
+
+`npm install react-redux-gen`
+
 # react-redux-gen
 Redux-gen will generate actions, thunk and reducers in one line using naming conventions and API based.
 
@@ -12,6 +24,68 @@ Redux Gen generate actions and reducers based on convention, and there's many us
 
 ## Why?
 As the application increase, the process of create actions and reducers is pretty repetitive and we can get a lot of benefits if we use the same language that API REST naming conventions if we are connecting on an API.
+
+## Methods
+
+You can use these three utility functions from react-redux-gen:
+
+`import { genActionNames, genPlainActions, genAsyncActions } from 'react-redux-gen'`
+
+### genActionNames
+
+Returns the action names in a object so you can use to be referecend later, like on reducers
+
+`genActionNames(entity, types, states)`
+
+| Parameter     | Type          | Description           | Default                                                |
+| ------------- | ------------- | --------------------- | ------------------------------------------------------ |
+| entity        | String        | The entity name       | There's no default for this one                        |
+| types         | Array         | Types of action       | Array('create', 'update', 'delete', 'list', 'fetch')   |
+| states        | Array         | States of request     | Array('REQUESTED', 'SUCCESS', 'ERROR')                 |  
+
+### genPlainActions
+
+Returns the action functions in a friendly way to be used to dispatch actions
+
+`genPlainActions(entity, types, states)`
+
+| Parameter     | Type          | Description           | Default                                                |
+| ------------- | ------------- | --------------------- | ------------------------------------------------------ |
+| entity        | String        | The entity name       | There's no default for this one                        |
+| types         | Array         | Types of action       | Array('create', 'update', 'delete', 'list', 'fetch')   |
+| states        | Array         | States of request     | Array('REQUESTED', 'SUCCESS', 'ERROR')                 |  
+
+For `REQUESTED` state, it will return the following action object:
+
+```
+{ type: 'ENTITY_TYPE_REQUESTED', completed: false, error: false }
+```
+
+For `SUCCESS` state, it will return the following action object:
+
+```
+{ type: 'ENTITY_TYPE_SUCCESS', completed: true, data: data, error: false }
+```
+
+For `ERROR` state, it will return the following action object:
+
+```
+{ type: 'ENTITY_TYPE_ERROR', completed: true, error: error }
+```
+
+### genAsyncActions
+
+Returns the async action standard function to communicate with rest API. These functions make calls to api's based on the base URL, dispatching request action, success when succeed, and error when the the call to the api fails. We use axios to make our calls.
+
+`genAsyncActions(entity, url, headers, types, states)`
+
+| Parameter     | Type          | Description                 | Default                                                |
+| ------------- | ------------- | --------------------------- | ------------------------------------------------------ |
+| entity        | String        | The entity name             | There's no default for this one                        |
+| url           | String        | The base url to call        | There's no default for this one                        |
+| headers       | Object        | Extra headers               | There's no default for this one                        |
+| types         | Array         | Types of action             | Array('create', 'update', 'delete', 'list', 'fetch')   |
+| states        | Array         | States of request           | Array('REQUESTED', 'SUCCESS', 'ERROR')                 |  
 
 ### Example
 
@@ -47,7 +121,7 @@ Our generated async actions is like this:
 import axios from 'axios'
 import { genPlainActions, genActionNames } from 'react-redux-gen'
 
-const actions = genPlainActions('user',['action'])
+const actions = genPlainActions('user', '/authenticated', ['action'])
 // [0] => REQUESTED, [1] => SUCCESS, [2] => ERROR
 
 const example = () => {
@@ -71,9 +145,12 @@ The async actions is still experimental and we don't support much customization 
 ### How to use
 
 With the async object is possible to dispatch actions from this call, for example:
+
 `genAsyncActions('user', 'http://example.com/user/')['create']({name: 'jonh doe'})`
 
-Will dispatch `{ type: 'CREATE_USER_REQUESTED', completed: false }`, `{ type: 'CREATE_USER_SUCCESS', error: false, completed: true, data: {name: 'John doe'} }`, 
+Will dispatch 
+
+`{ type: 'CREATE_USER_REQUESTED', completed: false }`, `{ type: 'CREATE_USER_SUCCESS', error: false, completed: true, data: {name: 'John doe'} }`, 
 
 and for an error on create:
 
@@ -209,6 +286,13 @@ const login = (state = { completed: true, data: {}, error: false }, action) => {
 export default login
 ```
 
+## Where is used
+
+### Ahorta - https://ahorta.io
+You can check our actions and reducers from a project using react-redux-gen
+
+[See full example on a real project](https://github.com/worknenjoy/ahorta-client/tree/master/src)
+
 ## Contribute
 
 ### Run the first time
@@ -223,3 +307,6 @@ export default login
 
 ### Contributors
 This package is maintained by [Alexandre Magno](https://alexandremagno.net)
+
+### License
+This open source library is licensed under [MIT](https://github.com/alexanmtz/react-redux-gen/blob/master/LICENSE)
