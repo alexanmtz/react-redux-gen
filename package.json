@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/alexanmtz/react-redux-gen#readme",
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "path": "^0.12.7",
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
