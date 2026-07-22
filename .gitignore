@@ -1,1 +1,9 @@
 node_modules/
+dist/
+build/
+coverage/
+*.log
+.DS_Store
+*.tsbuildinfo
+examples/node_modules/
+examples/package-lock.json

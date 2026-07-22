@@ -1,312 +1,479 @@
 ![](react-redux-gen-medium.png)
 
 ### NPM
-You can find [this package on NPM](https://www.npmjs.com/package/react-redux-gen)
+
+[react-redux-gen on NPM](https://www.npmjs.com/package/react-redux-gen)
 
 ### Install
-Yarn: 
 
-`yarn react-redux-gen`
+```bash
+yarn add react-redux-gen
+# or
+npm install react-redux-gen
+```
 
-NPM:
-
-`npm install react-redux-gen`
+Peer dependency: `redux` (>= 4). Async REST/GraphQL thunks use `axios` (bundled dependency).
 
 # react-redux-gen
-Redux-gen will generate actions, thunk and reducers in one line using naming conventions and API based.
 
-You can use fully if you have an standard object CRUD, like an User, or use the plain actions and extend with your async actions.
+Generate Redux **action names**, **plain action creators**, **async thunks**, and **reducers** from naming conventions.
 
-This is based on Redux. If this is too advanced for you, and you need to know more in how to use redux, please check the guides: https://redux.js.org/recipes/reducing-boilerplate
+v1 is written in **TypeScript**, supports **REST**, **GraphQL**, and **WebSocket** via a pluggable adapter layer, and uses **named** lifecycle access (`requested` / `success` / `error`) instead of array indices.
 
-## Purpose
-Redux Gen generate actions and reducers based on convention, and there's many use cases to use the way you want
+> New to Redux? Start with the [official Redux docs](https://redux.js.org/).
 
 ## Why?
-As the application increase, the process of create actions and reducers is pretty repetitive and we can get a lot of benefits if we use the same language that API REST naming conventions if we are connecting on an API.
 
-## Methods
+As apps grow, action/reducer boilerplate repeats. If your API follows REST (or GraphQL / WS) conventions, you can generate the Redux surface once and stay consistent.
 
-You can use these three utility functions from react-redux-gen:
+## Quick start
 
-`import { genActionNames, genPlainActions, genAsyncActions } from 'react-redux-gen'`
+```ts
+import { createClient, genPlainActions, genReducer } from 'react-redux-gen'
 
-### genActionNames
+// 1) Choose a protocol
+const client = createClient({
+  protocol: 'REST',
+  baseUrl: 'https://api.example.com/users',
+  headers: { Authorization: `Bearer ${token}` },
+})
 
-Returns the action names in a object so you can use to be referecend later, like on reducers
+// 2) Generate async thunks + reducer
+const userAsync = client.genAsyncActions('user')
+const userReducer = client.genReducer('user', {
+  data: null,
+  error: false,
+  completed: true,
+})
 
-`genActionNames(entity, types, states)`
-
-| Parameter     | Type          | Description           | Default                                                |
-| ------------- | ------------- | --------------------- | ------------------------------------------------------ |
-| entity        | String        | The entity name       | There's no default for this one                        |
-| types         | Array         | Types of action       | Array('create', 'update', 'delete', 'list', 'fetch')   |
-| states        | Array         | States of request     | Array('REQUESTED', 'SUCCESS', 'ERROR')                 |  
-
-### genPlainActions
-
-Returns the action functions in a friendly way to be used to dispatch actions
-
-`genPlainActions(entity, types, states)`
-
-| Parameter     | Type          | Description           | Default                                                |
-| ------------- | ------------- | --------------------- | ------------------------------------------------------ |
-| entity        | String        | The entity name       | There's no default for this one                        |
-| types         | Array         | Types of action       | Array('create', 'update', 'delete', 'list', 'fetch')   |
-| states        | Array         | States of request     | Array('REQUESTED', 'SUCCESS', 'ERROR')                 |  
-
-For `REQUESTED` state, it will return the following action object:
-
-```
-{ type: 'ENTITY_TYPE_REQUESTED', completed: false, error: false }
+// 3) Dispatch
+dispatch(userAsync.list())
+dispatch(userAsync.create({ name: 'Ada' }))
+dispatch(userAsync.fetch(1))
+dispatch(userAsync.update(1, { name: 'Ada Lovelace' }))
+dispatch(userAsync.delete(1))
 ```
 
-For `SUCCESS` state, it will return the following action object:
+### Named lifecycle (important)
 
-```
-{ type: 'ENTITY_TYPE_SUCCESS', completed: true, data: data, error: false }
-```
+```ts
+const actions = genPlainActions('user', ['action'])
 
-For `ERROR` state, it will return the following action object:
+// Prefer named keys:
+actions.action.requested()
+actions.action.success(data)
+actions.action.error(error)
 
-```
-{ type: 'ENTITY_TYPE_ERROR', completed: true, error: error }
-```
-
-### genAsyncActions
-
-Returns the async action standard function to communicate with rest API. These functions make calls to api's based on the base URL, dispatching request action, success when succeed, and error when the the call to the api fails. We use axios to make our calls.
-
-`genAsyncActions(entity, url, headers, types, states)`
-
-| Parameter     | Type          | Description                 | Default                                                |
-| ------------- | ------------- | --------------------------- | ------------------------------------------------------ |
-| entity        | String        | The entity name             | There's no default for this one                        |
-| url           | String        | The base url to call        | There's no default for this one                        |
-| headers       | Object        | Extra headers               | There's no default for this one                        |
-| types         | Array         | Types of action             | Array('create', 'update', 'delete', 'list', 'fetch')   |
-| states        | Array         | States of request           | Array('REQUESTED', 'SUCCESS', 'ERROR')                 |  
-
-### Example
-
-This is a basic example to use to define the CRUD actions for your `user` object
-
-```
-import { genPlainActions, genAsyncActions } from 'react-redux-gen'
-
-const userActions = genPlainActions('user')
-const userAsyncActions = genAsyncActions('user', '/users)
-
-export { userActions, userAsyncActions }
+// Action type strings:
+const names = client.genActionNames('user')
+names.create.requested // 'CREATE_USER_REQUESTED'
+names.create.success   // 'CREATE_USER_SUCCESS'
+names.create.error     // 'CREATE_USER_ERROR'
 ```
 
-This code above will generate the actions needed with states `REQUESTED`, `SUCCESS` and `ERROR` for actions and the async actions with the basic calls from these states.
+> **Migration from v0:** `actions.x[0|1|2]` → `actions.x.requested|success|error`.
 
-#### This will generate the following actions object:
+---
 
+## Core generators
+
+These work with any protocol (they only care about naming):
+
+```ts
+import {
+  genActionNames,
+  genPlainActions,
+  genAsyncActions,
+  genReducer,
+} from 'react-redux-gen'
 ```
-{
-  'create': ['CREATE_USER_REQUESTED', 'CREATE_USER_SUCCESS', 'CREATE_USER_ERROR'],
-  'update': ['UPDATE_USER_REQUESTED', 'UPDATE_USER_SUCCESS', 'UPDATE_USER_ERROR'],
-  'delete': ['DELETE_USER_REQUESTED', 'DELETE_USER_SUCCESS', 'DELETE_USER_ERROR'],
-  'list': ['LIST_USER_REQUESTED', 'LIST_USER_SUCCESS', 'LIST_USER_ERROR'],
-  'fetch': ['FETCH_USER_REQUESTED', 'FETCH_USER_SUCCESS', 'FETCH_USER_ERROR'],
+
+### `genActionNames(entity, types?, states?)`
+
+Returns named action **type strings**.
+
+| Parameter | Type | Default |
+|-----------|------|---------|
+| `entity` | `string` | required |
+| `types` | `string[]` | `['create','update','delete','list','fetch']` |
+| `states` | `string[]` | `['REQUESTED','SUCCESS','ERROR']` |
+
+```ts
+genActionNames('user')
+// {
+//   create: { requested: 'CREATE_USER_REQUESTED', success: '...', error: '...' },
+//   update: { ... },
+//   ...
+// }
+```
+
+### `genPlainActions(entity, types?, states?)`
+
+Returns named **action creators**.
+
+```ts
+const actions = genPlainActions('user')
+
+actions.create.requested()
+// { type: 'CREATE_USER_REQUESTED', completed: false }
+
+actions.create.success({ id: 1 })
+// { type: 'CREATE_USER_SUCCESS', completed: true, error: false, data: { id: 1 } }
+
+actions.create.error(err)
+// { type: 'CREATE_USER_ERROR', completed: true, error: err }
+```
+
+### `genAsyncActions(entity, url, headers?, types?, states?)`
+
+Convenience wrapper for **REST** (same as `createClient({ protocol: 'REST', baseUrl: url })`).
+
+```ts
+const userAsync = genAsyncActions('user', 'https://api.example.com/users', {
+  Authorization: 'Bearer …',
+})
+
+dispatch(userAsync.create({ name: 'Ada' }))
+```
+
+### `genReducer(entity, initialState)`
+
+Standard CRUD reducer for default types × default states.
+
+```ts
+const user = genReducer('user', { data: {}, error: false, completed: true })
+```
+
+---
+
+## Protocol adapters
+
+Initialize once with the protocol your project uses. Adapters share a common base class so more transports can be added later.
+
+```ts
+import { createClient } from 'react-redux-gen'
+
+createClient({ protocol: 'REST', baseUrl: '…' })
+createClient({ protocol: 'GRAPHQL', endpoint: '…' })
+createClient({ protocol: 'WEBSOCKET', url: '…' })
+```
+
+Every adapter implements:
+
+```ts
+interface Adapter {
+  readonly protocol: 'REST' | 'GRAPHQL' | 'WEBSOCKET'
+  genActionNames(entity, types?, states?)
+  genPlainActions(entity, types?, states?)
+  genAsyncActions(entity, options?)
+  genReducer(entity, initialState)
 }
 ```
 
-#### And the following async actions from a base url
+### REST
 
-Our generated async actions is like this:
+```ts
+const rest = createClient({
+  protocol: 'REST',
+  baseUrl: 'https://api.example.com/users',
+  headers: { 'Content-Type': 'application/json' },
+})
+
+const asyncActions = rest.genAsyncActions('user')
+// optional resource URL override:
+rest.genAsyncActions('user', 'https://api.example.com/v2/users')
 ```
+
+| Op | HTTP | URL |
+|----|------|-----|
+| list | GET | `baseUrl` |
+| fetch | GET | `baseUrl/:id` |
+| create | POST | `baseUrl` |
+| update | PUT | `baseUrl/:id` |
+| delete | DELETE | `baseUrl/:id` |
+
+### GraphQL
+
+Generates standard **list** / **get** queries and **create** / **update** / **delete** mutations.
+
+```ts
+const gql = createClient({
+  protocol: 'GRAPHQL',
+  endpoint: 'https://api.example.com/graphql',
+  selection: 'id name email',
+})
+
+const asyncActions = gql.genAsyncActions('user')
+
+// Override documents when needed:
+gql.genAsyncActions('user', {
+  operations: {
+    list: `query { users { id name } }`,
+  },
+})
+```
+
+### WebSocket
+
+Sends JSON envelopes and waits for a correlated response (`requestId` / matching `type`).
+
+```ts
+const ws = createClient({
+  protocol: 'WEBSOCKET',
+  url: 'wss://api.example.com/ws',
+  messageTypePrefix: 'app',
+  // Node / tests: inject a socket factory
+  createSocket: (url) => new WebSocket(url),
+})
+
+const asyncActions = ws.genAsyncActions('message')
+dispatch(asyncActions.create({ text: 'hello' }))
+```
+
+Envelope:
+
+```json
+{ "type": "app.message.create", "payload": { "text": "hello" }, "requestId": "…" }
+```
+
+---
+
+## Custom async actions
+
+Use plain generators when the flow is not standard CRUD (login, multi-step, etc.):
+
+```ts
 import axios from 'axios'
 import { genPlainActions, genActionNames } from 'react-redux-gen'
 
-const actions = genPlainActions('user', '/authenticated', ['action'])
-// [0] => REQUESTED, [1] => SUCCESS, [2] => ERROR
+const loginActions = genPlainActions('user', ['logged', 'login', 'logout', 'register'])
+const loginActionNames = genActionNames('user', ['logged', 'login', 'logout', 'register'])
 
-const example = () => {
-  return dispatch => {
-    dispatch(actions.action[0]())
-    return axios
-      .get('/authenticated')
-      .then( response => {
-        return dispatch(actions.action[1](response.data))
-      }).catch( e => {
-        return dispatch(actions.action[2](e))
-      })
-  }
+const login = (user) => (dispatch) => {
+  dispatch(loginActions.login.requested())
+  return axios
+    .post('/authorize/local', user)
+    .then((res) => dispatch(loginActions.login.success(res.data)))
+    .catch((err) => dispatch(loginActions.login.error(err)))
 }
 ```
 
-### Important NOTE!
+Hand-written reducer:
 
-The async actions is still experimental and we don't support much customization for these case, and we hope to improve this for new releases.
-
-### How to use
-
-With the async object is possible to dispatch actions from this call, for example:
-
-`genAsyncActions('user', 'http://example.com/user/')['create']({name: 'jonh doe'})`
-
-Will dispatch 
-
-`{ type: 'CREATE_USER_REQUESTED', completed: false }`, `{ type: 'CREATE_USER_SUCCESS', error: false, completed: true, data: {name: 'John doe'} }`, 
-
-and for an error on create:
-
-will generate `{ type: 'CREATE_USER_REQUESTED', completed: false }`, `{ type: 'CREATE_USER_ERROR', error: {}, completed: true }`
-
-If you want to pass headers to axios, you should run like this example:
-
-```
-import { genPlainActions, genAsyncActions } from 'react-redux-gen' 
-
-const headers = {
-    'Authorization': `Basic ${process.env.REACT_APP_SECRET}`,
-    'Content-Type': 'application/json'
-  }
-
-const userActions = genPlainActions('user')
-const userAsyncActions = genAsyncActions('user', '/users', headers)
-
-export { userActions, userAsyncActions }
-```
-
-### And for reducers
-
-```
-import { genReducer } from 'react-redux-gen'
-
-const user = genReducer('user', { data: {}, error: false, completed: true }) // the object and initial state
-
-export default user
-```
-
-### Custom examples
-
-If you want to use just the actions and use your own async actions, feel free to do like the example below for a login action:
-```import axios from 'axios'
-import { genPlainActions, genActionNames } from 'react-redux-gen'
-import { host } from '../url'
-
-import Auth from '../modules/Auth'
-
-const headers = {
-  'Authorization': `Bearer ${Auth.getToken()}`,
-  'Content-Type': 'application/json'
+```ts
+switch (action.type) {
+  case loginActionNames.login.requested:
+    return { ...state, completed: action.completed }
+  case loginActionNames.login.success:
+    return { ...state, completed: action.completed, data: action.data, error: false }
+  case loginActionNames.login.error:
+    return { ...state, completed: action.completed, error: action.error }
+  default:
+    return state
 }
-
-const loginActionNames = genActionNames('user', ['logged', 'login', 'logout'])
-const loginActions = genPlainActions('user',['logged', 'login', 'logout', 'register'])
-
-const logged = () => {
-  return dispatch => {
-    dispatch(loginActions.logged[0]())
-    return axios
-      .get(host + '/authenticated', { headers: {
-        'Authorization': `Bearer ${Auth.getToken()}`,
-        'Content-Type': 'application/json'
-      }
-      })
-      .then( response => {
-        return dispatch(loginActions.logged[1](response.data))
-      }).catch( e => {
-        return dispatch(loginActions.logged[2](e))
-      })
-  }
-}
-
-const login = (user) => {
-  return dispatch => {
-    dispatch(loginActions.login[0]())
-    return axios
-      .post(host + '/authorize/local', user)
-      .then( response => {
-        return dispatch(loginActions.login[1](response.data))
-      }).catch( e => {
-        return dispatch(loginActions.login[2](e))
-      })
-  }
-}
-
-const logout = () => {
-  return (dispatch) => {
-    dispatch(loginActions.logout[0]())
-    if(Auth.deauthenticateUser()) {
-      return dispatch(loginActions.logout[1]({}))
-    }
-    return dispatch(loginActions.logout[2](new Error('we have an error to logout, try again later')))
-  }
-}
-
-const register = (user) => {
-  return dispatch => {
-    dispatch(loginActions.register[0]())
-    return axios
-      .post(host + '/auth/register', user)
-      .then( response => {
-        return dispatch(loginActions.register[1](response.data))
-      }).catch( e => {
-        return dispatch(loginActions.register[2](e))
-      })
-  }
-}
-
-
-
-export { loginActionNames, loginActions, logged, login, logout, register }
 ```
 
-### Reducer
-For a login reducer, we could use
+Full runnable demos: **[examples/](./examples)** (REST, GraphQL, WebSocket, custom auth).
+
+---
+
+## Project structure
+
 ```
-import {
-  loginActionNames
-} from '../actions/login'
-
-const login = (state = { completed: true, data: {}, error: false }, action) => {
-  switch (action.type) {
-    case loginActionNames.logged[0]:
-      return { ...state, completed: action.completed }
-    case loginActionNames.logged[1]:
-      return { ...state, completed: action.completed, data: action.data, error: false }
-    case loginActionNames.logged[2]:
-      return { ...state, completed: action.completed, error: action.error }
-    case loginActionNames.logout[0]:
-      return { ...state, completed: action.completed, error: action.error }
-    case loginActionNames.logout[1]:
-      return { ...state, completed: action.completed, error: action.error, data: action.data }
-    case loginActionNames.logout[2]:
-      return { ...state, completed: action.completed, error: action.error }
-    default:
-      return state
-  }
-}
-
-export default login
+src/
+  types.ts                 # shared public types
+  index.ts                 # public API
+  constants/               # default CRUD types & states
+  shared/                  # pure helpers (one function per file)
+  actions/                 # genActionNames, genPlainActions, genAsyncActions
+  reducers/                # genReducer
+  adapters/
+    types.ts
+    base-adapter.ts        # abstract Adapter
+    create-client.ts       # factory
+    rest/
+    graphql/
+    websocket/
 ```
 
-## Where is used
+Design rules:
 
-### Ahorta - https://ahorta.io
-You can check our actions and reducers from a project using react-redux-gen
+- **Types** live in `types.ts` (or adapter-local `types.ts`)
+- **One function (or class) per file**
+- **Shared pure logic** under `shared/`
+- **Protocol code** isolated under `adapters/<name>/`
 
-[See full example on a real project](https://github.com/worknenjoy/ahorta-client/tree/master/src)
+---
 
 ## Contribute
 
-### Run the first time
-`yarn install`
+### Development setup
 
-### Run the project
-`yarn start`
+```bash
+# Node 18+ recommended
+npm install
+npm test
+npm run test:coverage   # threshold: 90%
+npm run build
+npm run typecheck
+```
 
-### Run the tests
-`yarn test`
+### Scripts
 
+| Script | Description |
+|--------|-------------|
+| `npm test` | Jest unit tests |
+| `npm run test:coverage` | Coverage report (fails under 90%) |
+| `npm run build` | Emit CJS + ESM + `.d.ts` via tsup |
+| `npm run dev` | Watch build |
+| `npm run typecheck` | `tsc --noEmit` |
 
-### Contributors
-This package is maintained by [Alexandre Magno](https://alexandremagno.net)
+### Examples
 
-### License
-This open source library is licensed under [MIT](https://github.com/alexanmtz/react-redux-gen/blob/master/LICENSE)
+```bash
+npm run build
+cd examples && npm install
+npm run rest      # or graphql | websocket | custom | all
+```
+
+See [examples/README.md](./examples/README.md).
+
+---
+
+## Contribution guidelines: creating a new adapter
+
+Adapters let the library support additional transports (gRPC-web, Firebase, tRPC, …) without mixing concerns.
+
+### 1. Folder layout
+
+```
+src/adapters/myprotocol/
+  types.ts              # protocol-specific options & message types
+  myprotocol-adapter.ts # class extending BaseAdapter
+  # one helper function per file, e.g.:
+  build-request.ts
+  create-myprotocol-thunk.ts
+```
+
+### 2. Extend `BaseAdapter`
+
+```ts
+// src/adapters/myprotocol/myprotocol-adapter.ts
+import { BaseAdapter } from '../base-adapter'
+import type { AsyncActionsMap } from '../../types'
+import type { MyProtocolAdapterOptions } from './types'
+import { createMyProtocolThunk } from './create-myprotocol-thunk'
+
+export class MyProtocolAdapter extends BaseAdapter {
+  readonly protocol = 'MYPROTOCOL' as const
+  // store options…
+
+  constructor(options: MyProtocolAdapterOptions) {
+    super(options)
+    // …
+  }
+
+  genAsyncActions(entity: string, options?: unknown): AsyncActionsMap {
+    const plain = this.genPlainActions(entity)
+    const actions: AsyncActionsMap = {}
+
+    Object.keys(plain).forEach((key) => {
+      actions[key] = createMyProtocolThunk(
+        key,
+        entity,
+        /* transport deps */,
+        plain[key]
+      )
+    })
+
+    return actions
+  }
+}
+```
+
+`BaseAdapter` already implements `genActionNames`, `genPlainActions`, and `genReducer`. You only implement **async I/O**.
+
+### 3. Thunk contract
+
+Each async action must:
+
+1. `dispatch(plain.requested())`
+2. Perform the transport call
+3. `dispatch(plain.success(data))` or `dispatch(plain.error(error))`
+4. Return a `Promise` so callers can `await dispatch(...)`
+
+Use helpers from `src/shared/` for action objects when useful; reuse `createStateActionCreator` / named maps rather than inventing parallel shapes.
+
+### 4. Register the protocol
+
+1. Extend `Protocol` in `src/types.ts` (or keep protocol as a string on the class only).
+2. Add options to the `CreateClientOptions` union in `src/adapters/types.ts`.
+3. Handle the case in `src/adapters/create-client.ts`.
+4. Export the adapter + types from `src/index.ts`.
+
+### 5. Types
+
+- Put **public** types in `src/types.ts` or export adapter `types.ts` from the package entry.
+- Keep **internal** request/response shapes in the adapter folder’s `types.ts`.
+- Prefer explicit interfaces over `any`.
+
+### 6. Tests (required)
+
+Add `tests/myprotocol-adapter.test.ts` covering:
+
+- Success path for each operation you support  
+- Error path  
+- Edge cases (timeouts, malformed payloads, missing config)  
+- `createClient({ protocol: 'MYPROTOCOL', … })` wiring  
+
+Keep global coverage **≥ 90%** (`npm run test:coverage`).
+
+### 7. Example + docs
+
+1. Add `examples/src/myprotocol/` with a runnable offline demo.  
+2. Document it in `examples/README.md`.  
+3. Add a short section to this README under **Protocol adapters**.  
+4. List any new peer dependencies in `package.json` and this install section.
+
+### 8. Checklist
+
+- [ ] `src/adapters/<name>/` with one function/class per file  
+- [ ] Extends `BaseAdapter`, implements `genAsyncActions`  
+- [ ] Registered in `createClient`  
+- [ ] Exported from `src/index.ts`  
+- [ ] Unit tests + coverage ≥ 90%  
+- [ ] Example project + README notes  
+- [ ] No protocol-specific logic leaked into `shared/` or other adapters  
+
+### Architecture sketch
+
+```
+                 createClient(options)
+                         │
+           ┌─────────────┼─────────────┐
+           ▼             ▼             ▼
+      RestAdapter  GraphQLAdapter  WebSocketAdapter
+           │             │             │
+           └─────────────┴─────────────┘
+                         │
+                   BaseAdapter
+              genActionNames / genPlainActions / genReducer
+                         │
+              shared helpers + actions/ + reducers/
+```
+
+---
+
+## Where it is used
+
+### Ahorta — https://ahorta.io
+
+Real-world actions/reducers: [ahorta-client](https://github.com/worknenjoy/ahorta-client/tree/master/src)
+
+---
+
+## License
+
+MIT — see [LICENSE](./LICENSE)
+
+Maintained by [Alexandre Magno](https://alexandremagno.net)

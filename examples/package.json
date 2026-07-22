@@ -1,0 +1,25 @@
+{
+  "name": "react-redux-gen-examples",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Example projects demonstrating react-redux-gen with REST, GraphQL, WebSocket and custom actions",
+  "type": "module",
+  "scripts": {
+    "rest": "tsx src/rest/index.ts",
+    "graphql": "tsx src/graphql/index.ts",
+    "websocket": "tsx src/websocket/index.ts",
+    "custom": "tsx src/custom/index.ts",
+    "all": "tsx src/run-all.ts"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "react-redux-gen": "file:..",
+    "redux": "^5.0.1",
+    "redux-thunk": "^3.1.0"
+  },
+  "devDependencies": {
+    "nock": "^14.0.16",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}
